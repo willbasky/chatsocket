@@ -1,0 +1,124 @@
+cabal-version: 3.6
+
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           hs-chatsocket
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/hs-chatsocket#readme>
+homepage:       https://github.com/githubuser/hs-chatsocket#readme
+bug-reports:    https://github.com/githubuser/hs-chatsocket/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2023 Author name here
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+-- source-repository head
+--   type: git
+--   location: https://github.com/githubuser/hs-chatsocket
+
+common common-options
+  build-depends:       base >= 4.11 && < 5
+
+  ghc-options:         -Wall
+                       -Wcompat
+                       -Widentities
+                       -Wincomplete-uni-patterns
+                       -Wincomplete-record-updates
+                       -Wredundant-constraints
+                      --  -split-sections
+                       -fhide-source-paths
+                      --  -Wmissing-export-lists
+                       -Wpartial-fields
+                       -Wmissing-deriving-strategies
+                       -fwrite-ide-info
+                       -hiedir=.hie
+                       -Wunused-packages
+                      --  -ddump-if-trace
+
+  default-language:    Haskell2010
+
+  default-extensions:
+                       DataKinds
+                       DeriveGeneric
+                       DerivingStrategies
+                       DuplicateRecordFields
+                       FlexibleContexts
+                       FlexibleInstances
+                       GADTs
+                       ImportQualifiedPost
+                       LambdaCase
+                       MultiParamTypeClasses
+                       OverloadedStrings
+                       RankNTypes
+                       RecordWildCards
+                       PolyKinds
+                       ScopedTypeVariables
+                       TemplateHaskell
+                       TupleSections
+                       TypeApplications
+                       TypeFamilies
+                       TypeOperators
+                       TypeSynonymInstances
+                       UndecidableInstances
+
+library
+  import:
+      common-options
+  exposed-modules:
+      Server
+      Client
+  other-modules:
+      Paths_hs_chatsocket
+  hs-source-dirs:
+      src
+  build-depends:
+      containers
+    , extra
+    , network
+    , text
+    , time
+    , websockets
+
+executable server
+  import:
+      common-options
+  main-is: Main.hs
+  other-modules:
+      Paths_hs_chatsocket
+  hs-source-dirs:
+      server
+  ghc-options: -Wmissing-home-modules -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+    hs-chatsocket
+
+executable client
+  import:
+      common-options
+  main-is: Main.hs
+  other-modules:
+      Paths_hs_chatsocket
+  hs-source-dirs:
+      client
+  ghc-options: -Wmissing-home-modules -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+    hs-chatsocket
+
+test-suite hs-chatsocket-test
+  import:
+      common-options
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_hs_chatsocket
+  hs-source-dirs:
+      test
+  ghc-options: -Wmissing-home-modules -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+    hs-chatsocket
