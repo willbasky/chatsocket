@@ -12,7 +12,7 @@ Multi language implementation of simple chat with websockets for educational pur
 
 - [x] Haskell
 - [ ] PureScript
-- [ ] Ocaml
+- [x] Ocaml
 - [ ] Python
 - [ ] TypeScript
 - [ ] Rust
@@ -48,6 +48,11 @@ Run client in another tab of the console:
 ```
 
 ## Functionality
+
+### Haskell
+
+1. Sending p2p messages
+2. Counting time of roundtrip for common messages
 
 ### Ocaml
 
