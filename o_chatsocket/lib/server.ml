@@ -4,6 +4,9 @@ open Common
 
 let section = Lwt_log.Section.make "ahrefs"
 
+(*
+Server is able to handle several opcodes from clients
+*)
 let rec react trip client client_id =
   let open Websocket in
   Connected_client.recv client >>= fun fr ->
@@ -28,9 +31,13 @@ let rec react trip client client_id =
     let end_time = Unix.gettimeofday () in
     let content = fr.content in
     let with_acknowledge = String.starts_with ~prefix:acknowledge content in
+    (* Acknoledge messages is handled with counting roundtrip *)
     if with_acknowledge
       then trip_finish content trip end_time >>= fun () -> react trip client client_id
       else
+        (* before printing received message server sends acknoladge to client
+           Client does the same.
+        *)
         let trip_message = acknowledge ^ content in
         Connected_client.send client (Frame.create ~content:trip_message ()) >>= fun () ->
         Lwt_io.printf "Client %d: %s\n" client_id content >>= fun () ->
@@ -38,6 +45,13 @@ let rec react trip client client_id =
 
   | _ -> Connected_client.send client Frame.(close 1002)
 
+(* Server send messages to specific client by its id.
+Example of message:
+1hello sends hello to client 1
+There are two commands: ping and close
+0#ping return pong of the client 0
+0#close send close command to client 0
+*)
 let rec pushf clients trip =
   read_mvar clients >>= fun cs ->
   let open Websocket in
@@ -66,7 +80,10 @@ let rec pushf clients trip =
 
 let server uri =
   let id = ref (-1) in
+  (* Map of start times of ever sent messages.
+     When roundtrip finished the key*value is removed *)
   let trip = Lwt_mvar.create @@ BatMap.empty in
+  (* Map holds pairs id/client it is address book for server *)
   let clients = Lwt_mvar.create @@ (Hashtbl.create 0 : (int, Connected_client.t) Hashtbl.t) in
   let echo_fun client =
     incr id;

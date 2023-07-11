@@ -5,6 +5,7 @@ open Common
 
 let rec react conn trip () =
     let open Websocket in
+    (* The logic of ping, pong and text opcodes is similar to server's one *)
     Websocket_lwt_unix.read conn >>= function
     | { Frame.opcode = Ping; _ } ->
           write conn (Frame.create ~opcode:Pong ()) >>=
@@ -30,6 +31,9 @@ let rec react conn trip () =
               Lwt_io.printf "Server: %s\n" content >>= react conn trip
     | _ -> Websocket_lwt_unix.close_transport conn
 
+(* The logic of pushf is similar to server's one,
+but without pointing the address
+*)
 let rec pushf conn trip () =
     let open Websocket in
     Lwt_io.(read_line_opt stdin) >>= function
@@ -50,5 +54,6 @@ let client uri =
   let ctx = Lazy.force Conduit_lwt_unix.default_ctx in
   Conduit_lwt_unix.endp_to_client ~ctx endp >>= fun client ->
   connect ~ctx client uri >>= fun conn ->
+  (* The client has its own rountrip database *)
   let trip = Lwt_mvar.create BatMap.empty in
   pushf conn trip () <?> react conn trip ()
