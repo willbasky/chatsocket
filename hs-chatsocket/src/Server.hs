@@ -52,7 +52,6 @@ addClient (user, conn) clients = case Map.lookup user clients of
   Nothing -> Map.insert user conn clients
   Just _ -> clients
 
-
 -- Remove a client:
 
 removeClient :: Client -> ServerState -> ServerState
@@ -190,8 +189,6 @@ talk (user, conn) state = do
           startTime <- getCurrentTime
           modifyMVar_ trips $ pure . Map.insert (T.take 10 l) startTime
           loop
-        -- when (line `elem` [user, "exit", "kick", "close"]) $
-        --   WS.sendClose conn ("Bye!" :: Text)
 
   loop
 

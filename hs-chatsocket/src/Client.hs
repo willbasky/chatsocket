@@ -37,7 +37,7 @@ app conn = do
                   modifyMVar_ trips $ \t -> do
                     case Map.lookup key t of
                       Nothing -> do
-                        TIO.putStrLn "There is not key in the roundtrips"
+                        TIO.putStrLn "There is not key in the roundtrip"
                         pure t
                       Just start -> do
                         TIO.putStrLn
@@ -49,7 +49,7 @@ app conn = do
 
 
             else do
-              unless (T.isPrefixOf admin msg) $ do
+              unless (T.isPrefixOf admin msg) $
                 WS.sendTextData conn $ acknowledge <> space <> msg
               TIO.putStrLn $ "Server: " <> msg
         -- WS.sendTextData conn $ "Message received: " <> msg
@@ -58,14 +58,19 @@ app conn = do
     let loop = do
             line <- TIO.getLine
             unless (T.null line) $ do
-              WS.sendTextData conn line
-              startTime <- getCurrentTime
-              modifyMVar_ trips $ pure . Map.insert (T.take 10 line) startTime
-              loop
+              if line == "ping"
+                then do
+                  WS.sendPing conn line
+                  loop
+                else do
+                  WS.sendTextData conn line
+                  startTime <- getCurrentTime
+                  modifyMVar_ trips $ pure . Map.insert (T.take 10 line) startTime
+                  loop
 
     loop
     WS.sendClose conn ("Bye!" :: Text)
 
 
 client :: IO ()
-client = withSocketsDo $ WS.runClient "127.0.0.1" 9160 "/" app
+client = withSocketsDo $ WS.runClient "127.0.0.1" 9001 "/" app
