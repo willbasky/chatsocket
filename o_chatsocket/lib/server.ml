@@ -38,32 +38,43 @@ let rec react trip client client_id =
 
   | _ -> Connected_client.send client Frame.(close 1002)
 
-let rec pushf client trip =
+let rec pushf clients trip =
+  read_mvar clients >>= fun cs ->
   let open Websocket in
   Lwt_io.(read_line_opt stdin) >>= function
-  | None -> pushf client trip
+  | None -> pushf clients trip
   | Some cont ->
-    match cont with
-    | "#ping" ->
-        Connected_client.send client (Frame.create ~opcode:Ping ()) >>=fun () ->
-        pushf client trip
-    | "#close" -> Connected_client.send client @@ Frame.close 1000
-    | _ ->
-        let key = take 10 cont in
-        Connected_client.send client (Frame.create ~content:cont ()) >>= fun () ->
-        let start_time = Unix.gettimeofday () in
-        trip_start trip key start_time >>= fun () ->
-        pushf client trip
+      let (id_opt, str) = get_client cont in
+      match Option.bind id_opt (fun id -> Hashtbl.find_opt cs id) with
+      | None ->
+          Lwt_io.print "Invalid client id passed\n" >>= fun () ->
+          pushf clients trip
+      | Some client ->
+          match str with
+          | "#ping" ->
+              Connected_client.send client (Frame.create ~opcode:Ping ()) >>= fun () ->
+              pushf clients trip
+          | "#close" ->
+              Connected_client.send client @@ Frame.close 1000
+          | _ ->
+            let key = take 10 str in
+            Connected_client.send client (Frame.create ~content:str ()) >>= fun () ->
+            let start_time = Unix.gettimeofday () in
+            trip_start trip key start_time >>= fun () ->
+            pushf clients trip
+
 
 let server uri =
   let id = ref (-1) in
   let trip = Lwt_mvar.create @@ BatMap.empty in
+  let clients = Lwt_mvar.create @@ (Hashtbl.create 0 : (int, Connected_client.t) Hashtbl.t) in
   let echo_fun client =
     incr id;
     let id = !id in
+    modify_mvar_ clients (fun cs -> Hashtbl.add cs id client; Lwt.return cs) >>= fun () ->
     Lwt_log.info_f ~section "Connection from client id %d" id >>= fun () ->
     Lwt.catch
-      (fun () -> react trip client id <?> pushf client trip)
+      (fun () -> react trip client id <?> pushf clients trip)
       (fun exn ->
         Lwt_log.error_f ~section ~exn "Client %d error" id >>= fun () ->
         Lwt.fail exn)

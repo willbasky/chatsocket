@@ -6,7 +6,7 @@ Multi language implementation of simple chat with websockets for educational pur
 
 1. Many clients can be run
 2. Time measurement for every roundtrip (message - acknowledgement)
-3. Server send messages individually to every client with format: user # message
+3. Server send messages individually to every client
 
 ## Roadmap
 
@@ -51,12 +51,12 @@ Run client in another tab of the console:
 
 ### Haskell
 
-1. Sending p2p messages
+1. Sending p2p messages with format: user # message
 2. Counting time of roundtrip for common messages
 
 ### Ocaml
 
-1. Sending p2p messages
+1. Sending p2p messages with int <id>message. For example 0hello
 2. Counting time of roundtrip for common messages
-3. Command #ping return pong from opponent
-4. Command #close on server closes client, on client asks server to send Close signal and close client.
+3. Command id#ping return pong from opponent
+4. Command id#close on server closes client, on client asks server to send Close signal and close client.

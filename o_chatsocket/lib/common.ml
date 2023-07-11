@@ -41,3 +41,8 @@ let trip_finish content trip end_time =
 
 let trip_start trip key start_time =
   modify_mvar_ trip (fun a -> Lwt.return @@ BatMap.add key start_time a)
+
+let get_client str =
+  let (id, str) = A.String.span ~sat:BatChar.is_digit str in
+  (Stdlib.int_of_string_opt id, str)
+
