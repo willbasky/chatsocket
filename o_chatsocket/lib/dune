@@ -1,0 +1,5 @@
+(library
+ (public_name chatsocket)
+ (name chatsocket)
+ (libraries websocket-lwt-unix sexplib0 lwt_log astring batteries)
+ )
