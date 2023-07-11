@@ -1,0 +1,6 @@
+(executable
+ (public_name chatsocket)
+ (name main)
+ (modules main)
+ (libraries chatsocket lwt))
+

@@ -22,3 +22,7 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 stack.yaml.lock
+
+# Ocaml
+_build/
+_opam

@@ -20,7 +20,7 @@ Multi language implementation of simple chat with websockets for educational pur
 
 ## How to use
 
-- Haskell
+### Haskell
 
 ```shell
 stack run server
@@ -30,6 +30,28 @@ in another tab of the console:
 ```shell
 stack run client
 ```
-In client
+In client type further message to register client:
 
     Hi! I am <name>
+
+### Ocaml
+
+Run server:
+
+```shell
+ dune exec -- chatsocket -s
+ ```
+Run client in another tab of the console:
+
+```shell
+ dune exec -- chatsocket
+```
+
+## Functionality
+
+### Ocaml
+
+1. Sending p2p messages
+2. Counting time of roundtrip for common messages
+3. Command #ping return pong from opponent
+4. Command #close on server closes client, on client asks server to send Close signal and close client.
